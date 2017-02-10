@@ -23,8 +23,22 @@ func SimdCrc32c(src string) int {
     return int(C.SimdCrc32c(p, C.size_t(len(src))))
 }
 
+func SimdAbsDifferenceSum() int64 {
+    a := unsafe.Pointer(C.CBytes("aaaa"))
+    defer C.free(a)
+    aStride := 4
+    b := unsafe.Pointer(C.CBytes("cccc"))
+    defer C.free(b)
+    bStride := 4
+    width, height := 4, 1
+    sum := C.uint64_t(0)
+    C.SimdAbsDifferenceSum((*C.uint8_t)(a), C.size_t(aStride), (*C.uint8_t)(b), C.size_t(bStride), C.size_t(width), C.size_t(height), &sum)
+    return int64(sum)
+}
+
 func main() {
 	fmt.Println("Simd version:", SimdVersion())
 	fmt.Println("Alignment   :", SimdAlignment())
     fmt.Println("Crc32c      :", SimdCrc32c("aap"))
+    fmt.Println("AbsDiffSum  :", SimdAbsDifferenceSum())
 }
