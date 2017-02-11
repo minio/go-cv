@@ -17,12 +17,6 @@ func SimdAlignment() int {
     return int(C.SimdAlignment())
 }
 
-func SimdCrc32c(src string) int {
-    p := unsafe.Pointer(C.CBytes(src))
-    defer C.free(p)
-    return int(C.SimdCrc32c(p, C.size_t(len(src))))
-}
-
 func SimdAbsDifferenceSum() int64 {
     a := unsafe.Pointer(C.CBytes("aaaa"))
     defer C.free(a)
@@ -35,6 +29,21 @@ func SimdAbsDifferenceSum() int64 {
     C.SimdAbsDifferenceSum((*C.uint8_t)(a), C.size_t(aStride), (*C.uint8_t)(b), C.size_t(bStride), C.size_t(width), C.size_t(height), &sum)
     return int64(sum)
 }
+
+// ingroup difference_estimation
+//SimdAddFeatureDifference(const uint8_t * value, size_t valueStride, size_t width, size_t height, const uint8_t * lo, size_t loStride, const uint8_t * hi, size_t hiStride,  uint16_t weight, uint8_t * difference, size_t differenceStride)
+
+// ingroup drawing
+//SimdAlphaBlending(const uint8_t * src, size_t srcStride, size_t width, size_t height, size_t channelCount, const uint8_t * alpha, size_t alphaStride, uint8_t * dst, size_t dstStride)
+
+// ingroup integral
+//SimdIntegral(const uint8_t * src, size_t srcStride, size_t width, size_t height, uint8_t * sum, size_t sumStride, uint8_t * sqsum, size_t sqsumStride, uint8_t * tilted, size_t tiltedStride, SimdPixelFormatType sumFormat, SimdPixelFormatType sqsumFormat)
+
+// ingroup shifting
+//SimdShiftBilinear(const uint8_t * src, size_t srcStride, size_t width, size_t height, size_t channelCount, const uint8_t * bkg, size_t bkgStride, const double * shiftX, const double * shiftY, size_t cropLeft, size_t cropTop, size_t cropRight, size_t cropBottom, uint8_t * dst, size_t dstStride)
+
+// ingroup svm
+//SimdSvmSumLinear(const float * x, const float * svs, const float * weights, size_t length, size_t count, float * sum)
 
 func main() {
 	fmt.Println("Simd version:", SimdVersion())
