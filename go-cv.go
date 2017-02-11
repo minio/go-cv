@@ -13,10 +13,6 @@ func SimdVersion() string {
 	return C.GoString(C.SimdVersion())
 }
 
-func SimdAlignment() int {
-    return int(C.SimdAlignment())
-}
-
 func SimdAbsDifferenceSum() int64 {
     a := unsafe.Pointer(C.CBytes("aaaa"))
     defer C.free(a)
@@ -32,7 +28,7 @@ func SimdAbsDifferenceSum() int64 {
 
 func main() {
 	fmt.Println("Simd version:", SimdVersion())
-	fmt.Println("Alignment   :", SimdAlignment())
+	fmt.Println("Alignment   :", Alignment())
     fmt.Println("Crc32c      :", SimdCrc32c("aap"))
     fmt.Println("AbsDiffSum  :", SimdAbsDifferenceSum())
 }
