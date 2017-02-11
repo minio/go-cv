@@ -9,7 +9,7 @@ import "C"
 import "fmt"
 import "unsafe"
 
-func SimdVersion() string {
+func Version() string {
 	return C.GoString(C.SimdVersion())
 }
 
@@ -27,8 +27,8 @@ func SimdAbsDifferenceSum() int64 {
 }
 
 func main() {
-	fmt.Println("Simd version:", SimdVersion())
+	fmt.Println("Simd version:", Version())
 	fmt.Println("Alignment   :", Alignment())
-    fmt.Println("Crc32c      :", SimdCrc32c("aap"))
+    fmt.Println("Crc32c      :", Crc32c("aap"))
     fmt.Println("AbsDiffSum  :", SimdAbsDifferenceSum())
 }

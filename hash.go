@@ -11,7 +11,7 @@ import "unsafe"
 // ingroup hash
 //SimdCrc32c(const void * src, size_t size)
 
-func SimdCrc32c(src string) int {
+func Crc32c(src string) int {
 	p := unsafe.Pointer(C.CBytes(src))
 	defer C.free(p)
 	return int(C.SimdCrc32c(p, C.size_t(len(src))))
