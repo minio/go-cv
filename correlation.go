@@ -5,7 +5,6 @@ package main
 // #include "Simd/SimdLib.h"
 // #cgo LDFLAGS: -lstdc++
 import "C"
-import "unsafe"
 
 // AbsDifferenceSum gets sum of absolute difference of two gray 8-bit images.
 // Both images must have the same width and height.
@@ -13,15 +12,8 @@ import "unsafe"
 // [in] b - second image.
 // [out] sum - the result sum of absolute difference of two images.
 func AbsDifferenceSum(a, b View) int64 {
-	ap := unsafe.Pointer(C.CBytes("aaaa"))
-	defer C.free(ap)
-	aStride := 4
-	bp := unsafe.Pointer(C.CBytes("cccc"))
-	defer C.free(bp)
-	bStride := 4
-	width, height := 4, 1
 	sum := C.uint64_t(0)
-	C.SimdAbsDifferenceSum((*C.uint8_t)(ap), C.size_t(aStride), (*C.uint8_t)(bp), C.size_t(bStride), C.size_t(width), C.size_t(height), &sum)
+	C.SimdAbsDifferenceSum((*C.uint8_t)(a.data), C.size_t(a.stride), (*C.uint8_t)(b.data), C.size_t(b.stride), C.size_t(a.width), C.size_t(a.height), &sum)
 	return int64(sum)
 }
 
