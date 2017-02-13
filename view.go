@@ -65,6 +65,45 @@ func PixelSize(f Format) int {
 	}
 }
 
+func ChannelCount(f Format) int {
+	switch f {
+	case NONE:
+		return 0
+	case GRAY8:
+		return 1
+	case UV16:
+		return 2
+	case BGR24:
+		return 3
+	case BGRA32:
+		return 4
+	case INT16:
+		return 1
+	case INT32:
+		return 1
+	case INT64:
+		return 1
+	case FLOAT:
+		return 1
+	case DOUBLE:
+		return 1
+	case BAYERGRBG:
+		return 1
+	case BAYERGBRG:
+		return 1
+	case BAYERRGGB:
+		return 1
+	case BAYERBGGR:
+		return 1
+	case HSV24:
+		return 3
+	case HSL24:
+		return 3
+	default:
+		return 0
+	}
+}
+
 type View struct {
 	width, height int
 	format        Format
