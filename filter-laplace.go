@@ -6,8 +6,11 @@ package main
 // #cgo LDFLAGS: -lstdc++
 import "C"
 
-func Laplace(a, b View) {
-	C.SimdLaplace((*C.uint8_t)(a.data), C.size_t(a.stride), C.size_t(a.width), C.size_t(a.height), (*C.uint8_t)(b.data), C.size_t(b.stride))
+func Laplace(src, dst View) {
+	C.SimdLaplace((*C.uint8_t)(src.data), C.size_t(src.stride), C.size_t(src.width), C.size_t(src.height), (*C.uint8_t)(dst.data), C.size_t(dst.stride))
 }
 
-//SimdLaplaceAbs(const uint8_t * src, size_t srcStride, size_t width, size_t height, uint8_t * dst, size_t dstStride)
+func LaplaceAbs(src, dst View) {
+
+	C.SimdLaplaceAbs((*C.uint8_t)(src.data), C.size_t(src.stride), C.size_t(src.width), C.size_t(src.height), (*C.uint8_t)(dst.data), C.size_t(dst.stride))
+}
