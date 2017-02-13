@@ -11,10 +11,10 @@ import "C"
 // [in] a - first image.
 // [in] b - second image.
 // [out] sum - the result sum of absolute difference of two images.
-func AbsDifferenceSum(a, b View) int64 {
+func AbsDifferenceSum(a, b View) uint64 {
 	sum := C.uint64_t(0)
 	C.SimdAbsDifferenceSum((*C.uint8_t)(a.data), C.size_t(a.stride), (*C.uint8_t)(b.data), C.size_t(b.stride), C.size_t(a.width), C.size_t(a.height), &sum)
-	return int64(sum)
+	return uint64(sum)
 }
 
 //SimdAbsDifferenceSumMasked(const uint8_t * a, size_t aStride, const uint8_t * b, size_t bStride, const uint8_t * mask, size_t maskStride, uint8_t index, size_t width, size_t height, uint64_t * sum)
