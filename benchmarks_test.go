@@ -17,6 +17,12 @@ func SimdSetup() (View, View) {
 	return a, b
 }
 
+/////////////////////////////////////////////////////////////////////
+//
+// S i m d
+//
+/////////////////////////////////////////////////////////////////////
+
 func BenchmarkSimdGaussian(b *testing.B) {
 
 	src, dst := SimdSetup()
@@ -52,6 +58,24 @@ func BenchmarkSimdMedian5x5(b *testing.B) {
 		MedianFilterSquare5x5(src, dst)
 	}
 }
+
+func BenchmarkSimdSobel(b *testing.B) {
+
+	src, _ := SimdSetup()
+	dst := View{}
+	dst.Recreate(Resolution, Resolution, INT16)
+
+	for i := 0; i < b.N; i++ {
+		SobelDx(src, dst)
+		SobelDy(src, dst)
+	}
+}
+
+/////////////////////////////////////////////////////////////////////
+//
+// O p e n C V
+//
+/////////////////////////////////////////////////////////////////////
 
 func OpenCVSetup() (*opencv.IplImage, *opencv.IplImage) {
 
@@ -94,5 +118,14 @@ func BenchmarkOpenCVMedian5x5(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		opencv.Smooth(src, dst, opencv.CV_MEDIAN, 5, 5, 0, 0)
+	}
+}
+
+func BenchmarkOpenCVSobel(b *testing.B) {
+
+	src, dst := OpenCVSetup()
+
+	for i := 0; i < b.N; i++ {
+		opencv.Sobel(src, dst, 1, 1, 3)
 	}
 }
