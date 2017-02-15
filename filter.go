@@ -38,6 +38,10 @@ func MedianFilterSquare5x5(src, dst View) {
 }
 
 // ingroup other_filter
+func GaussianBlur3x3(src, dst View) {
+	C.SimdGaussianBlur3x3((*C.uint8_t)(src.data), C.size_t(src.stride), C.size_t(src.width), C.size_t(src.height), C.size_t(ChannelCount(src.format)), (*C.uint8_t)(dst.data), C.size_t(dst.stride))
+}
+
 //SimdAbsGradientSaturatedSum(const uint8_t * src, size_t srcStride, size_t width, size_t height, uint8_t * dst, size_t dstStride)
 //SimdLbpEstimate(const uint8_t * src, size_t srcStride, size_t width, size_t height, uint8_t * dst, size_t dstStride)
 
