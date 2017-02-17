@@ -1,5 +1,11 @@
 package main
 
+// #cgo pkg-config: simd
+// #include "stdlib.h"
+// #include "Simd/SimdLib.h"
+// #cgo LDFLAGS: -lstdc++
+import "C"
+
 // ingroup bayer_conversion
 //SimdBayerToBgr(const uint8_t * bayer, size_t width, size_t height, size_t bayerStride, SimdPixelFormatType bayerFormat, uint8_t * bgr, size_t bgrStride)
 //SimdBayerToBgra(const uint8_t * bayer, size_t width, size_t height, size_t bayerStride, SimdPixelFormatType bayerFormat, uint8_t * bgra, size_t bgraStride, uint8_t alpha)
@@ -7,9 +13,22 @@ package main
 // ingroup bgr_conversion
 //SimdBgrToBayer(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * bayer, size_t bayerStride, SimdPixelFormatType bayerFormat)
 //SimdBgrToBgra(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * bgra, size_t bgraStride, uint8_t alpha)
-//SimdBgrToGray(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * gray, size_t grayStride)
-//SimdBgrToHsl(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * hsl, size_t hslStride)
-//SimdBgrToHsv(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * hsv, size_t hsvStride)
+
+func BgrToGray(bgr, gray View) {
+
+	C.SimdBgrToGray((*C.uint8_t)(bgr.data), C.size_t(bgr.width), C.size_t(bgr.height), C.size_t(bgr.stride), (*C.uint8_t)(gray.data), C.size_t(gray.stride))
+}
+
+func BgrToHsl(bgr, hsl View) {
+
+	C.SimdBgrToHsl((*C.uint8_t)(bgr.data), C.size_t(bgr.width), C.size_t(bgr.height), C.size_t(bgr.stride), (*C.uint8_t)(hsl.data), C.size_t(hsl.stride))
+}
+
+func BgrToHsv(bgr, hsv View) {
+
+	C.SimdBgrToHsv((*C.uint8_t)(bgr.data), C.size_t(bgr.width), C.size_t(bgr.height), C.size_t(bgr.stride), (*C.uint8_t)(hsv.data), C.size_t(hsv.stride))
+}
+
 //SimdBgrToYuv420p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride)
 //SimdBgrToYuv422p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride)
 //SimdBgrToYuv444p(const uint8_t * bgr, size_t width, size_t height, size_t bgrStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride)
