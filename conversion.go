@@ -42,6 +42,10 @@ func BgrToHsv(bgr, hsv View) {
 //SimdBgraToYuv444p(const uint8_t * bgra, size_t width, size_t height, size_t bgraStride, uint8_t * y, size_t yStride, uint8_t * u, size_t uStride, uint8_t * v, size_t vStride)
 
 // ingroup gray_conversion
+func GrayToBgr(gray, bgr View) {
+	C.SimdGrayToBgr((*C.uint8_t)(gray.data), C.size_t(gray.width), C.size_t(gray.height), C.size_t(gray.stride), (*C.uint8_t)(bgr.data), C.size_t(bgr.stride))
+}
+
 //SimdGrayToBgra(const uint8_t *gray, size_t width, size_t height, size_t grayStride, uint8_t *bgra, size_t bgraStride, uint8_t alpha)
 
 // ingroup other_conversion

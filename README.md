@@ -39,6 +39,7 @@ BenchmarkMedian5x5RGB-8     42957406      24858284      -42.13%
 BenchmarkBGRtoGray-8        1416342       1367315       -3.46%
 BenchmarkBGRtoHsv-8         8766591       10982978      +25.28%
 BenchmarkBGRtoHsl-8         13180733      10882656      -17.44%
+BenchmarkGraytoBGR-8        1428323       1392910       -2.48%
 ```
 
 ### ARM

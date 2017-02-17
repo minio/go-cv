@@ -156,6 +156,16 @@ func BenchmarkSimdBGRtoHsv(b *testing.B) {
 	}
 }
 
+func BenchmarkSimdGraytoBGR(b *testing.B) {
+
+	src, _ := SimdSetup(GRAY8)
+	_, dst := SimdSetup(BGR24)
+
+	for i := 0; i < b.N; i++ {
+		GrayToBgr(src, dst)
+	}
+}
+
 // AsRGBA returns an RGBA copy of the supplied image.
 func AsRGBA(src image.Image) *image.RGBA {
 	bounds := src.Bounds()
@@ -295,6 +305,17 @@ func BenchmarkOpenCVBGRtoHsl(b *testing.B) {
 		opencv.CvtColor(src, dst, 52) // from /* COLOR_BGR2HLS = 52 from opencv-2.4.10/modules/imgproc/include/opencv2/imgproc/imgproc.hpp */
 	}
 }
+
+func BenchmarkOpenCVGraytoBGR(b *testing.B) {
+
+	src, _ := OpenCVSetup(1)
+	_, dst := OpenCVSetup(3)
+
+	for i := 0; i < b.N; i++ {
+		opencv.CvtColor(src, dst, 8) // from /* COLOR_GRAY2BGR = 8 from opencv-2.4.10/modules/imgproc/include/opencv2/imgproc/imgproc.hpp */
+	}
+}
+
 
 func benchmarkOpenCVSobel(b *testing.B, channels int) {
 
