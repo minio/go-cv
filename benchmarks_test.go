@@ -1,21 +1,18 @@
 package main
 
 import (
+	"os"
+	"fmt"
+	"image"
+	"image/draw"
 	"testing"
 	"github.com/lazywei/go-opencv/opencv"
-
+	"github.com/anthonynsimon/bild/noise"
+	"github.com/anthonynsimon/bild/blur"
+	"github.com/anthonynsimon/bild/imgio"
 )
 
 const Resolution = 2048
-
-func SimdSetup() (View, View) {
-
-	a, b := View{}, View{}
-	a.Recreate(Resolution, Resolution, GRAY8)
-	b.Recreate(Resolution, Resolution, GRAY8)
-
-	return a, b
-}
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -23,43 +20,121 @@ func SimdSetup() (View, View) {
 //
 /////////////////////////////////////////////////////////////////////
 
-func BenchmarkSimdGaussian(b *testing.B) {
+func SimdSetup(f Format) (View, View) {
 
-	src, dst := SimdSetup()
+	a, b := View{}, View{}
+	a.Recreate(Resolution, Resolution, f)
+	b.Recreate(Resolution, Resolution, f)
+
+	return a, b
+}
+
+func benchmarkSimdGaussian(b *testing.B, f Format) {
+
+	src, dst := SimdSetup(f)
 
 	for i := 0; i < b.N; i++ {
 		GaussianBlur3x3(src, dst)
 	}
 }
 
-func BenchmarkSimdBlur(b *testing.B) {
+func BenchmarkSimdGaussian(b *testing.B) {
 
-	src, dst := SimdSetup()
+	benchmarkSimdGaussian(b, GRAY8)
+}
+
+func BenchmarkSimdGaussianRGB(b *testing.B) {
+
+	benchmarkSimdGaussian(b, BGR24)
+}
+
+func benchmarkSimdBlur(b *testing.B, f Format) {
+
+	src, dst := SimdSetup(f)
 
 	for i := 0; i < b.N; i++ {
 		MeanFilter3x3(src, dst)
 	}
 }
 
-func BenchmarkSimdMedian3x3(b *testing.B) {
+func BenchmarkSimdBlur(b *testing.B) {
 
-	src, dst := SimdSetup()
+	benchmarkSimdBlur(b, GRAY8)
+}
+
+func BenchmarkSimdBlurRGB(b *testing.B) {
+
+	benchmarkSimdBlur(b, BGR24)
+}
+
+func benchmarkSimdMedian3x3(b *testing.B, f Format) {
+
+	src, dst := SimdSetup(f)
 
 	for i := 0; i < b.N; i++ {
 		MedianFilterSquare3x3(src, dst)
 	}
 }
 
-func BenchmarkSimdMedian5x5(b *testing.B) {
+func BenchmarkSimdMedian3x3(b *testing.B) {
 
-	src, dst := SimdSetup()
+	benchmarkSimdMedian3x3(b, GRAY8)
+}
+
+func BenchmarkSimdMedian3x3RGB(b *testing.B) {
+
+	benchmarkSimdMedian3x3(b, BGR24)
+}
+
+func benchmarkSimdMedian5x5(b *testing.B, f Format) {
+
+	src, dst := SimdSetup(f)
 
 	for i := 0; i < b.N; i++ {
 		MedianFilterSquare5x5(src, dst)
 	}
 }
 
-func BenchmarkSimdSobel(b *testing.B) {
+func BenchmarkSimdMedian5x5(b *testing.B) {
+
+	benchmarkSimdMedian5x5(b, GRAY8)
+}
+
+func BenchmarkSimdMedian5x5RGB(b *testing.B) {
+
+	benchmarkSimdMedian5x5(b, BGR24)
+}
+
+//func benchmarkSimdLaplace(b *testing.B, f Format) {
+//
+//	src, _ := SimdSetup(f)
+//	dst := View{}
+//	dst.Recreate(Resolution, Resolution, INT16)
+//
+//	for i := 0; i < b.N; i++ {
+//		Laplace(src, dst)
+//	}
+//}
+//
+//func BenchmarkSimdLaplace(b *testing.B) {
+//
+//	benchmarkSimdLaplace(b, GRAY8)
+//}
+//
+//func BenchmarkSimdLaplaceRGB(b *testing.B) {
+//
+//	benchmarkSimdLaplace(b, BGR24)
+//}
+
+// AsRGBA returns an RGBA copy of the supplied image.
+func AsRGBA(src image.Image) *image.RGBA {
+	bounds := src.Bounds()
+	img := image.NewRGBA(bounds)
+	draw.Draw(img, bounds, src, bounds.Min, draw.Src)
+	return img
+}
+
+func benchmarkSimdSobel(b *testing.B, f Format) {
 
 	src, _ := SimdSetup()
 	dst := View{}
@@ -77,55 +152,120 @@ func BenchmarkSimdSobel(b *testing.B) {
 //
 /////////////////////////////////////////////////////////////////////
 
-func OpenCVSetup() (*opencv.IplImage, *opencv.IplImage) {
+func OpenCVSetup(channels int) (*opencv.IplImage, *opencv.IplImage) {
 
-	a := opencv.CreateImage(Resolution, Resolution, 1, 1)
-	b := opencv.CreateImage(Resolution, Resolution, 1, 1)
+	a := opencv.CreateImage(Resolution, Resolution, 8, channels)
+	b := opencv.CreateImage(Resolution, Resolution, 8, channels)
 
 	return a, b
 }
 
-func BenchmarkOpenCVGaussian(b *testing.B) {
+func benchmarkOpenCVGaussian(b *testing.B, channels int) {
 
-	src, dst := OpenCVSetup()
+	src, dst := OpenCVSetup(channels)
 
 	for i := 0; i < b.N; i++ {
 		opencv.Smooth(src, dst, opencv.CV_GAUSSIAN, 3, 3, 0, 0)
 	}
 }
 
-func BenchmarkOpenCVBlur(b *testing.B) {
+func BenchmarkOpenCVGaussian(b *testing.B) {
 
-	src, dst := OpenCVSetup()
+	benchmarkOpenCVGaussian(b, 1)
+}
+
+func BenchmarkOpenCVGaussianRGB(b *testing.B) {
+
+	benchmarkOpenCVGaussian(b, 3)
+}
+
+func benchmarkOpenCVBlur(b *testing.B, channels int) {
+
+	src, dst := OpenCVSetup(channels)
 
 	for i := 0; i < b.N; i++ {
 		opencv.Smooth(src, dst, opencv.CV_BLUR, 3, 3, 0, 0)
 	}
 }
 
-func BenchmarkOpenCVMedian3x3(b *testing.B) {
+func BenchmarkOpenCVBlur(b *testing.B) {
 
-	src, dst := OpenCVSetup()
+	benchmarkOpenCVBlur(b, 1)
+}
+
+func BenchmarkOpenCVBlurRGB(b *testing.B) {
+
+	benchmarkOpenCVBlur(b, 3)
+}
+
+func benchmarkOpenCVMedian3x3(b *testing.B, channels int) {
+
+	src, dst := OpenCVSetup(channels)
 
 	for i := 0; i < b.N; i++ {
 		opencv.Smooth(src, dst, opencv.CV_MEDIAN, 3, 3, 0, 0)
 	}
 }
 
-func BenchmarkOpenCVMedian5x5(b *testing.B) {
+func BenchmarkOpenCVMedian3x3(b *testing.B) {
 
-	src, dst := OpenCVSetup()
+	benchmarkOpenCVMedian3x3(b, 1)
+}
+
+func BenchmarkOpenCVMedian3x3RGB(b *testing.B) {
+
+	benchmarkOpenCVMedian3x3(b, 3)
+}
+
+func benchmarkOpenCVMedian5x5(b *testing.B, channels int) {
+
+	src, dst := OpenCVSetup(channels)
 
 	for i := 0; i < b.N; i++ {
 		opencv.Smooth(src, dst, opencv.CV_MEDIAN, 5, 5, 0, 0)
 	}
 }
 
-func BenchmarkOpenCVSobel(b *testing.B) {
+func BenchmarkOpenCVMedian5x5(b *testing.B) {
 
-	src, dst := OpenCVSetup()
+	benchmarkOpenCVMedian5x5(b, 1)
+}
+
+func BenchmarkOpenCVMedian5x5RGB(b *testing.B) {
+
+	benchmarkOpenCVMedian5x5(b, 3)
+}
+
+func benchmarkOpenCVSobel(b *testing.B, channels int) {
+
+	src, dst := OpenCVSetup(channels)
 
 	for i := 0; i < b.N; i++ {
-		opencv.Sobel(src, dst, 1, 1, 3)
+		opencv.Sobel(src, dst, 1, 0, 3)
+	}
+}
+
+func BenchmarkOpenCVSobel(b *testing.B) {
+
+	benchmarkOpenCVSobel(b, 1)
+}
+
+func BenchmarkOpenCVSobelRGB(b *testing.B) {
+
+	benchmarkOpenCVSobel(b, 3)
+}
+
+/////////////////////////////////////////////////////////////////////
+//
+// B i l d
+//
+/////////////////////////////////////////////////////////////////////
+
+func BenchmarkBildBlurRGBA(b *testing.B) {
+
+	img := noise.Generate(Resolution, Resolution, &noise.Options{Monochrome: true, NoiseFn: noise.Gaussian})
+
+	for i := 0; i < b.N; i++ {
+		blur.Box(img, 1.0)
 	}
 }
