@@ -126,6 +126,36 @@ func BenchmarkSimdMedian5x5RGB(b *testing.B) {
 //	benchmarkSimdLaplace(b, BGR24)
 //}
 
+func BenchmarkSimdBGRtoGray(b *testing.B) {
+
+	src, _ := SimdSetup(BGR24)
+	_, dst := SimdSetup(GRAY8)
+
+	for i := 0; i < b.N; i++ {
+		BgrToGray(src, dst)
+	}
+}
+
+func BenchmarkSimdBGRtoHsl(b *testing.B) {
+
+	src, _ := SimdSetup(BGR24)
+	_, dst := SimdSetup(HSL24)
+
+	for i := 0; i < b.N; i++ {
+		BgrToHsl(src, dst)
+	}
+}
+
+func BenchmarkSimdBGRtoHsv(b *testing.B) {
+
+	src, _ := SimdSetup(BGR24)
+	_, dst := SimdSetup(HSV24)
+
+	for i := 0; i < b.N; i++ {
+		BgrToHsl(src, dst)
+	}
+}
+
 // AsRGBA returns an RGBA copy of the supplied image.
 func AsRGBA(src image.Image) *image.RGBA {
 	bounds := src.Bounds()
@@ -234,6 +264,36 @@ func BenchmarkOpenCVMedian5x5(b *testing.B) {
 func BenchmarkOpenCVMedian5x5RGB(b *testing.B) {
 
 	benchmarkOpenCVMedian5x5(b, 3)
+}
+
+func BenchmarkOpenCVBGRtoGray(b *testing.B) {
+
+	src, _ := OpenCVSetup(3)
+	_, dst := OpenCVSetup(1)
+
+	for i := 0; i < b.N; i++ {
+		opencv.CvtColor(src, dst, opencv.CV_BGR2GRAY)
+	}
+}
+
+func BenchmarkOpenCVBGRtoHsv(b *testing.B) {
+
+	src, _ := OpenCVSetup(3)
+	_, dst := OpenCVSetup(3)
+
+	for i := 0; i < b.N; i++ {
+		opencv.CvtColor(src, dst, 40) // from /* CV_BGR2HSV = 40 from opencv-2.4.10/modules/imgproc/include/opencv2/imgproc/imgproc.hpp */
+	}
+}
+
+func BenchmarkOpenCVBGRtoHsl(b *testing.B) {
+
+	src, _ := OpenCVSetup(3)
+	_, dst := OpenCVSetup(3)
+
+	for i := 0; i < b.N; i++ {
+		opencv.CvtColor(src, dst, 52) // from /* COLOR_BGR2HLS = 52 from opencv-2.4.10/modules/imgproc/include/opencv2/imgproc/imgproc.hpp */
+	}
 }
 
 func benchmarkOpenCVSobel(b *testing.B, channels int) {
