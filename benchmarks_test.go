@@ -4,6 +4,7 @@ import (
 	"os"
 	"fmt"
 	"image"
+	"unsafe"
 	"image/draw"
 	"testing"
 	"github.com/lazywei/go-opencv/opencv"
@@ -164,6 +165,75 @@ func BenchmarkSimdGraytoBGR(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		GrayToBgr(src, dst)
 	}
+}
+
+func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int, int, View, View) {
+
+	throughColumn, int16 := 0, 0
+
+	src, _ := SimdSetup(GRAY8)
+
+	width, height := src.width, src.height
+
+	sum, sqsum, tilted := View{}, View{}, View{}
+	sum.Recreate(width + 1, height + 1, INT32)
+	sqsum.Recreate(width + 1, height + 1, INT32)
+	tilted.Recreate(width + 1, height + 1, INT32)
+
+	dat := DetectionLoadA(path)
+	if dat == nil {
+		panic("Cannot load cascade")
+	}
+
+	hid := DetectionInit(dat, sum, sqsum, tilted, throughColumn, int16)
+	if hid == nil {
+		panic("Cannot initialize haar cascade" /*"Cannot initialize LBP cascade"*/)
+	}
+
+	mask := View{}
+	mask.Recreate(width, height, GRAY8)
+	Fill(mask, 1)
+
+	w, h, _ := DetectionInfo(dat)
+
+	// if ((flags &SimdDetectionInfoFeatureMask) == SimdDetectionInfoFeatureLbp)
+	//     Simd::Integral(src, sum);
+	// if (flags&SimdDetectionInfoHasTilted)
+	//     Simd::Integral(src, sum, sqsum, tilted);
+	// else
+	Integral(src, sum, sqsum, tilted);
+
+	DetectionPrepare(hid)
+
+	dst1, dst2 := View{}, View{}
+	dst1.Recreate(width, height, GRAY8)
+	dst2.Recreate(width, height, GRAY8)
+
+	Fill(dst1, 0)
+
+	return dat, hid, width, height, w, h, mask, dst1
+}
+
+func BenchmarkSimdHaar32fp(b *testing.B) {
+
+	dat, hid, width, height, w, h, mask, dst1 := setupDectection("/Users/frankw/c_apps/Simd/data/cascade/haar_face_0.xml")
+
+	for i := 0; i < b.N; i++ {
+		DetectionHaarDetect32fp(hid, width/9, height/11, width-w, height-h, mask, dst1)
+	}
+
+	DetectionFree(dat)
+}
+
+func BenchmarkSimdHaar32fi(b *testing.B) {
+
+	dat, hid, width, height, w, h, mask, dst1 := setupDectection("/Users/frankw/c_apps/Simd/data/cascade/haar_face_0.xml")
+
+	for i := 0; i < b.N; i++ {
+		DetectionHaarDetect32fi(hid, width/9, height/11, width-w, height-h, mask, dst1)
+	}
+
+	DetectionFree(dat)
 }
 
 // AsRGBA returns an RGBA copy of the supplied image.
