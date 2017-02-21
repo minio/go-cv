@@ -1,0 +1,11 @@
+# Package Information for pkg-config
+
+prefix=/Users/frankw/c_apps/Simd
+includedir=${prefix}/src
+libdir=${prefix}/prj/cmake
+
+Name: Simd
+Description: Image processing library using of SIMD
+Version: 3.4.50.872
+Cflags: -I${includedir}
+Libs: -L${libdir} -lSimd -lSimdAvx1 -lSimdAvx2 -lSimdBase -lSimdSse1 -lSimdSse2 -lSimdSse3 -lSimdSse41 -lSimdSse42 -lSimdSsse3 -lTestCheckC
