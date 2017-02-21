@@ -316,6 +316,16 @@ func BenchmarkOpenCVGraytoBGR(b *testing.B) {
 	}
 }
 
+func BenchmarkOpenCVHaar(b *testing.B) {
+
+	src, _ := OpenCVSetup(3)
+
+	cascade := opencv.LoadHaarClassifierCascade("/Users/frankw/golang/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml")
+
+	for i := 0; i < b.N; i++ {
+		cascade.DetectObjects(src)
+	}
+}
 
 func benchmarkOpenCVSobel(b *testing.B, channels int) {
 
