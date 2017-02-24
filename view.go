@@ -4,6 +4,7 @@ import (
 	"C"
 	"fmt"
 	"image"
+	"image/draw"
 	"unsafe"
 )
 
@@ -170,4 +171,12 @@ func (v *View) CopyTo(img *image.RGBA) error {
 
 
 	return nil
+}
+
+// AsRGBA returns an RGBA copy of the supplied image.
+func AsRGBA(src image.Image) *image.RGBA {
+	bounds := src.Bounds()
+	img := image.NewRGBA(bounds)
+	draw.Draw(img, bounds, src, bounds.Min, draw.Src)
+	return img
 }
