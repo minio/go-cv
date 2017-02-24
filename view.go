@@ -1,7 +1,9 @@
 package main
 
 import (
+	"C"
 	"fmt"
+	"image"
 	"unsafe"
 )
 
@@ -131,6 +133,41 @@ func (v *View) Recreate(w, h int, f Format) {
 // Load
 func (v *View) Load(path string) error {
 	fmt.Println(path)
+
+	return nil
+}
+
+func (v *View) CopyFrom(img *image.RGBA) error {
+
+	for y := 0; y < img.Bounds().Size().Y; y++ {
+		start := y*img.Bounds().Size().X*4
+		psrcstart := unsafe.Pointer(uintptr(v.data)+uintptr(start))
+		for x := 0; x < img.Bounds().Size().X; x++ {
+			psrcdata := (*C.uint)(unsafe.Pointer(uintptr(psrcstart)+uintptr(x*4)))
+			*psrcdata = C.uint(uint32(img.Pix[start+x*4+0]) << 16 +
+			                   uint32(img.Pix[start+x*4+1]) << 8 +
+			                   uint32(img.Pix[start+x*4+2]) << 0 +
+			                   uint32(img.Pix[start+x*4+3]) << 24)
+		}
+	}
+
+	return nil
+}
+
+func (v *View) CopyTo(img *image.RGBA) error {
+
+	for y := 0; y < img.Bounds().Size().Y; y++ {
+		start := y*img.Bounds().Size().X*4
+		psrcstart := unsafe.Pointer(uintptr(v.data)+uintptr(start))
+		for x := 0; x < img.Bounds().Size().X; x++ {
+			psrcdata := (*C.uint)(unsafe.Pointer(uintptr(psrcstart)+uintptr(x*4)))
+			img.Pix[start+x*4+0] = uint8((*psrcdata >> 16) & 0xff)
+			img.Pix[start+x*4+1] = uint8((*psrcdata >> 8) & 0xff)
+			img.Pix[start+x*4+2] = uint8((*psrcdata >> 0) & 0xff)
+			img.Pix[start+x*4+3] = uint8((*psrcdata >> 24) & 0xff)
+		}
+	}
+
 
 	return nil
 }
