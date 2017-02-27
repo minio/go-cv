@@ -21,7 +21,20 @@ Show a performance comparison to OpenCV 2.4 for various techniques.
 ### AVX2
 
 ```
-TO DO
+benchmark                   old ns/op     new ns/op     delta
+BenchmarkGaussian-4         3734353       566876        -84.82%
+BenchmarkGaussianRGB-4      11377449      2491829       -78.10%
+BenchmarkBlur-4             5518315       558090        -89.89%
+BenchmarkBlurRGB-4          16723964      2576614       -84.59%
+BenchmarkMedian3x3-4        2694912       821913        -69.50%
+BenchmarkMedian3x3RGB-4     5735211       2457584       -57.15%
+BenchmarkMedian5x5-4        16241921      5007327       -69.17%
+BenchmarkMedian5x5RGB-4     40002965      15524691      -61.19%
+BenchmarkBGRtoGray-4        5688284       1220252       -78.55%
+BenchmarkBGRtoHsv-4         47361397      11109236      -76.54%
+BenchmarkBGRtoHsl-4         63311124      11108623      -82.45%
+BenchmarkGraytoBGR-4        5823166       680269        -88.32%
+BenchmarkCascadeHaar-4      366020630     60297843      -83.53%
 ```
 
 ### AVX1
