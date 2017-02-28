@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // #cgo pkg-config: simd
 // #include "stdlib.h"
@@ -7,48 +7,48 @@ package main
 import "C"
 
 import (
-	"os"
 	"fmt"
-	"time"
-	"image"
-	"github.com/anthonynsimon/bild/imgio"
+	"io/ioutil"
+	"unsafe"
+	"github.com/lazywei/go-opencv/opencv"
 )
 
-func Version() string {
-	return C.GoString(C.SimdVersion())
+/* DecodeImageMemM decodes an image from an in memory byte buffer. */
+func DecodeImageMemM(data []byte) *opencv.Mat {
+	buf := opencv.CreateMatHeader(1, len(data), opencv.CV_8U)
+	buf.SetData(unsafe.Pointer(&data[0]), opencv.CV_AUTOSTEP)
+	defer buf.Release()
+
+	return opencv.DecodeImageM(unsafe.Pointer(buf), opencv.CV_LOAD_IMAGE_UNCHANGED)
 }
 
-func LoadImage() {
+func LoadDetect() string {
 
-	reader, err := os.Open("/Users/frankw/c_apps/opencv-3.2.0/samples/data/lena.jpg")
-	if err != nil {
-		panic(err)
-	}
-	defer reader.Close()
-	m, _, err := image.Decode(reader)
-	if err != nil {
-		panic(err)
-	}
-	img := AsRGBA(m)
+    buf, err :=  ioutil.ReadFile("/home/ec2-user/work/src/github.com/lazywei/go-opencv/images/lena.jpg")
+    if err != nil {
+        panic("error loading from file")
+    }
+    pmat := DecodeImageMemM(buf)
+    fmt.Println("pmat:", pmat)
 
-	src := View{}
-	src.Recreate(img.Bounds().Size().X, img.Bounds().Size().Y, BGRA32)
-	src.CopyFrom(img)
+    detect := DetectInitialize("/home/ec2-user/c_apps/Simd/data/cascade/haar_face_0.xml")
 
-	dst := View{}
-	dst.Recreate(src.width, src.height, src.format)
+    return DetectObjects(pmat, detect)
+}
 
-	Copy(src, dst)
+func DetectInitialize(cascade string) unsafe.Pointer {
 
-	dst.CopyTo(img)
-	if err := imgio.Save("./filename", img, imgio.JPEG); err != nil {
-		panic(err)
-	}
+    var detect unsafe.Pointer
+    detect = C.SimdDetectInitialize(C.CString(cascade))
+
+    return detect
+}
+
+func DetectObjects(pmat *opencv.Mat, detect unsafe.Pointer) string {
+
+    return C.GoString(C.SimdDetectObjects(unsafe.Pointer(pmat), detect))
 }
 
 func main() {
-	fmt.Println("Simd version:", Version())
-	fmt.Println("Alignment   :", Alignment())
-	fmt.Println("Crc32c      :", Crc32c("aap"))
-	fmt.Println("AbsDiffSum  :", AbsDifferenceSum(View{}, View{}))
+	fmt.Println(LoadDetect())
 }

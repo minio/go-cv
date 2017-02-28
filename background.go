@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup background
 //SimdBackgroundGrowRangeSlow(const uint8_t * value, size_t valueStride, size_t width, size_t height, uint8_t * lo, size_t loStride, uint8_t * hi, size_t hiStride)

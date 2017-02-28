@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup neural
 //SimdNeuralConvert(const uint8_t * src, size_t stride, size_t width, size_t height, float * dst, int inversion)

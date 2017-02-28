@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // #cgo pkg-config: simd
 // #include "stdlib.h"

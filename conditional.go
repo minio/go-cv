@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup conditional
 //SimdConditionalCount8u(const uint8_t * src, size_t stride, size_t width, size_t height, uint8_t value, SimdCompareType compareType, uint32_t * count)

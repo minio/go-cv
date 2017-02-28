@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup texture_estimation
 //SimdTextureBoostedSaturatedGradient(const uint8_t * src, size_t srcStride, size_t width, size_t height, uint8_t saturation, uint8_t boost, uint8_t * dx, size_t dxStride, uint8_t * dy, size_t dyStride)

@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup interference
 //SimdInterferenceIncrement(uint8_t * statistic, size_t stride, size_t width, size_t height, uint8_t increment, int16_t saturation)

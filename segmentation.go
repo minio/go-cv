@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup segmentation
 //SimdSegmentationChangeIndex(uint8_t * mask, size_t stride, size_t width, size_t height, uint8_t oldIndex, uint8_t newIndex)

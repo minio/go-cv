@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup face_recognition
 

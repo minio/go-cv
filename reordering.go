@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup reordering
 //SimdReorder16bit(const uint8_t * src, size_t size, uint8_t * dst)

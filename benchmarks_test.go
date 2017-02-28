@@ -1,16 +1,11 @@
-package main
+package gocv
 
 import (
-	"os"
-	"fmt"
-	"image"
 	"unsafe"
-	"image/draw"
 	"testing"
 	"github.com/lazywei/go-opencv/opencv"
 	"github.com/anthonynsimon/bild/noise"
 	"github.com/anthonynsimon/bild/blur"
-	"github.com/anthonynsimon/bild/imgio"
 )
 
 const Resolution = 2048
@@ -214,17 +209,28 @@ func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int
 	return dat, hid, width, height, w, h, mask, dst1
 }
 
-func BenchmarkSimdHaar32fp(b *testing.B) {
+func benchmarkCascade(b *testing.B, cascade string) {
 
-	dat, hid, width, height, w, h, mask, dst1 := setupDectection("/Users/frankw/c_apps/Simd/data/cascade/haar_face_0.xml")
+    pmat := opencv.LoadImageM("/home/ec2-user/work/src/github.com/lazywei/go-opencv/images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
 
-	for i := 0; i < b.N; i++ {
-		DetectionHaarDetect32fp(hid, width/9, height/11, width-w, height-h, mask, dst1)
-	}
+    detect := DetectInitialize(cascade)
 
-	DetectionFree(dat)
+    for i := 0; i < b.N; i++ {
+        DetectObjects(pmat, detect)
+    }
 }
 
+func BenchmarkSimdCascadeHaar(b *testing.B) {
+
+    benchmarkCascade(b, "/home/ec2-user/c_apps/Simd/data/cascade/haar_face_0.xml")
+}
+
+func BenchmarkSimdCascadeLbp(b *testing.B) {
+
+    benchmarkCascade(b, "/home/ec2-user/c_apps/Simd/data/cascade/lbp_face.xml")
+}
+
+/*
 func BenchmarkSimdHaar32fi(b *testing.B) {
 
 	dat, hid, width, height, w, h, mask, dst1 := setupDectection("/Users/frankw/c_apps/Simd/data/cascade/haar_face_0.xml")
@@ -235,18 +241,11 @@ func BenchmarkSimdHaar32fi(b *testing.B) {
 
 	DetectionFree(dat)
 }
-
-// AsRGBA returns an RGBA copy of the supplied image.
-func AsRGBA(src image.Image) *image.RGBA {
-	bounds := src.Bounds()
-	img := image.NewRGBA(bounds)
-	draw.Draw(img, bounds, src, bounds.Min, draw.Src)
-	return img
-}
+*/
 
 func benchmarkSimdSobel(b *testing.B, f Format) {
 
-	src, _ := SimdSetup()
+	src, _ := SimdSetup(GRAY8)
 	dst := View{}
 	dst.Recreate(Resolution, Resolution, INT16)
 
@@ -386,15 +385,20 @@ func BenchmarkOpenCVGraytoBGR(b *testing.B) {
 	}
 }
 
-func BenchmarkOpenCVHaar(b *testing.B) {
+func benchmarkOpenCVCascade(b *testing.B, cascade string) {
 
-	src, _ := OpenCVSetup(3)
+        mat := opencv.LoadImage("/home/ec2-user/work/src/github.com/lazywei/go-opencv/images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
 
-	cascade := opencv.LoadHaarClassifierCascade("/Users/frankw/golang/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml")
+	detect := opencv.LoadHaarClassifierCascade(cascade)
 
 	for i := 0; i < b.N; i++ {
-		cascade.DetectObjects(src)
+		detect.DetectObjects(mat)
 	}
+}
+
+func BenchmarkOpenCVCascadeHaar(b *testing.B) {
+
+    benchmarkOpenCVCascade(b, "/home/ec2-user/work/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml" )
 }
 
 func benchmarkOpenCVSobel(b *testing.B, channels int) {

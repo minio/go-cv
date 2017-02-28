@@ -1,8 +1,7 @@
-package main
+package gocv
 
 import (
 	"C"
-	"fmt"
 	"image"
 	"image/draw"
 	"unsafe"
@@ -128,12 +127,10 @@ func (v *View) Recreate(w, h int, f Format) {
 	v.format = f
 	v.stride = Align(v.width*PixelSize(v.format), Alignment())
 	v.data = Allocate(v.height*v.stride, Alignment())
-	fmt.Println(*v)
 }
 
 // Load
 func (v *View) Load(path string) error {
-	fmt.Println(path)
 
 	return nil
 }

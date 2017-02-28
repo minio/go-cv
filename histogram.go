@@ -1,4 +1,4 @@
-package main
+package gocv
 
 // ingroup histogram
 //SimdAbsSecondDerivativeHistogram(const uint8_t * src, size_t width, size_t height, size_t stride, size_t step, size_t indent, uint32_t * histogram)
