@@ -1,6 +1,6 @@
 package gocv
 
-// #cgo pkg-config: simd
+// #cgo pkg-config: Simd
 // #include "stdlib.h"
 // #include "Simd/SimdLib.h"
 // #cgo LDFLAGS: -lstdc++
