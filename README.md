@@ -12,7 +12,7 @@ go get github.com/fwessels/go-cv
 
 ## Examples
 
-Provide several extensive examples demonstrating the use of go-cv.
+See the samples directory for several examples such as face detection, motion detection, contour detection etc.
 
 ## Performance comparison
 
