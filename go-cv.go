@@ -3,50 +3,61 @@ package gocv
 // #cgo pkg-config: Simd
 // #include "stdlib.h"
 // #include "Simd/SimdLib.h"
+//
 // #cgo LDFLAGS: -lstdc++
 import "C"
 
 import (
+	"bytes"
 	"fmt"
+	"image"
+	"image/draw"
+	_ "image/jpeg"
 	"io/ioutil"
 	"unsafe"
-	"github.com/lazywei/go-opencv/opencv"
 )
 
-/* DecodeImageMemM decodes an image from an in memory byte buffer. */
-func DecodeImageMemM(data []byte) *opencv.Mat {
-	buf := opencv.CreateMatHeader(1, len(data), opencv.CV_8U)
-	buf.SetData(unsafe.Pointer(&data[0]), opencv.CV_AUTOSTEP)
-	defer buf.Release()
+func DecodeImageMem(buf []byte) (*image.RGBA, error) {
+	img, _, err := image.Decode(bytes.NewReader(buf))
+	if err != nil {
+		return nil, err
+	}
 
-	return opencv.DecodeImageM(unsafe.Pointer(buf), opencv.CV_LOAD_IMAGE_UNCHANGED)
+	rect := img.Bounds()
+	rgba := image.NewRGBA(rect)
+	// Extract pixel information.
+	draw.Draw(rgba, rect, img, rect.Min, draw.Src)
+	return rgba, nil
 }
 
 func LoadDetect() string {
+	buf, err := ioutil.ReadFile("images/lena.jpg")
+	if err != nil {
+		panic(err)
+	}
 
-    buf, err :=  ioutil.ReadFile("/home/ec2-user/work/src/github.com/lazywei/go-opencv/images/lena.jpg")
-    if err != nil {
-        panic("error loading from file")
-    }
-    pmat := DecodeImageMemM(buf)
-    fmt.Println("pmat:", pmat)
+	img, err := DecodeImageMem(buf)
+	if err != nil {
+		panic(err)
+	}
 
-    detect := DetectInitialize("/home/ec2-user/c_apps/Simd/data/cascade/haar_face_0.xml")
+	detect := DetectInitialize("cascade/haar_face_0.xml")
+	return DetectObjects(img, detect)
+}
 
-    return DetectObjects(pmat, detect)
+func DetectObjects(img *image.RGBA, detect unsafe.Pointer) string {
+	return C.GoString(C.SimdDetectObjectsRaw(C.int(img.Rect.Max.X),
+		C.int(img.Rect.Max.Y),
+		C.int(img.Stride),
+		unsafe.Pointer(&img.Pix[0]),
+		detect))
 }
 
 func DetectInitialize(cascade string) unsafe.Pointer {
+	var detect unsafe.Pointer
+	detect = C.SimdDetectInitialize(C.CString(cascade))
 
-    var detect unsafe.Pointer
-    detect = C.SimdDetectInitialize(C.CString(cascade))
-
-    return detect
-}
-
-func DetectObjects(pmat *opencv.Mat, detect unsafe.Pointer) string {
-
-    return C.GoString(C.SimdDetectObjects(unsafe.Pointer(pmat), detect))
+	return detect
 }
 
 func main() {

@@ -1,6 +1,7 @@
 package gocv
 
 import (
+	"io/ioutil"
 	"testing"
 	"unsafe"
 
@@ -211,41 +212,30 @@ func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int
 }
 
 func benchmarkCascade(b *testing.B, cascade string) {
-
-	pmat := opencv.LoadImageM("images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
-
+	buf, err := ioutil.ReadFile("images/lena.jpg")
+	if err != nil {
+		panic(err)
+	}
 	detect := DetectInitialize(cascade)
 
 	for i := 0; i < b.N; i++ {
-		DetectObjects(pmat, detect)
+		img, err := DecodeImageMem(buf)
+		if err != nil {
+			panic(err)
+		}
+		DetectObjects(img, detect)
 	}
 }
 
 func BenchmarkSimdCascadeHaar(b *testing.B) {
-
 	benchmarkCascade(b, "cascade/haar_face_0.xml")
 }
 
 func BenchmarkSimdCascadeLbp(b *testing.B) {
-
 	benchmarkCascade(b, "cascade/lbp_face.xml")
 }
 
-/*
-func BenchmarkSimdHaar32fi(b *testing.B) {
-
-	dat, hid, width, height, w, h, mask, dst1 := setupDectection("/Users/frankw/c_apps/Simd/data/cascade/haar_face_0.xml")
-
-	for i := 0; i < b.N; i++ {
-		DetectionHaarDetect32fi(hid, width/9, height/11, width-w, height-h, mask, dst1)
-	}
-
-	DetectionFree(dat)
-}
-*/
-
 func benchmarkSimdSobel(b *testing.B, f Format) {
-
 	src, _ := SimdSetup(GRAY8)
 	dst := View{}
 	dst.Recreate(Resolution, Resolution, INT16)
