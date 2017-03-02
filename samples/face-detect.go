@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/fwessels/go-cv"
 	"io/ioutil"
+
+	"github.com/minio/go-cv"
 )
 
 func main() {

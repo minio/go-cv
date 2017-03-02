@@ -1,11 +1,12 @@
 package gocv
 
 import (
-	"unsafe"
 	"testing"
-	"github.com/lazywei/go-opencv/opencv"
-	"github.com/anthonynsimon/bild/noise"
+	"unsafe"
+
 	"github.com/anthonynsimon/bild/blur"
+	"github.com/anthonynsimon/bild/noise"
+	"github.com/lazywei/go-opencv/opencv"
 )
 
 const Resolution = 2048
@@ -171,9 +172,9 @@ func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int
 	width, height := src.width, src.height
 
 	sum, sqsum, tilted := View{}, View{}, View{}
-	sum.Recreate(width + 1, height + 1, INT32)
-	sqsum.Recreate(width + 1, height + 1, INT32)
-	tilted.Recreate(width + 1, height + 1, INT32)
+	sum.Recreate(width+1, height+1, INT32)
+	sqsum.Recreate(width+1, height+1, INT32)
+	tilted.Recreate(width+1, height+1, INT32)
 
 	dat := DetectionLoadA(path)
 	if dat == nil {
@@ -196,7 +197,7 @@ func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int
 	// if (flags&SimdDetectionInfoHasTilted)
 	//     Simd::Integral(src, sum, sqsum, tilted);
 	// else
-	Integral(src, sum, sqsum, tilted);
+	Integral(src, sum, sqsum, tilted)
 
 	DetectionPrepare(hid)
 
@@ -211,23 +212,23 @@ func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int
 
 func benchmarkCascade(b *testing.B, cascade string) {
 
-    pmat := opencv.LoadImageM("/home/ec2-user/work/src/github.com/lazywei/go-opencv/images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
+	pmat := opencv.LoadImageM("images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
 
-    detect := DetectInitialize(cascade)
+	detect := DetectInitialize(cascade)
 
-    for i := 0; i < b.N; i++ {
-        DetectObjects(pmat, detect)
-    }
+	for i := 0; i < b.N; i++ {
+		DetectObjects(pmat, detect)
+	}
 }
 
 func BenchmarkSimdCascadeHaar(b *testing.B) {
 
-    benchmarkCascade(b, "/home/ec2-user/c_apps/Simd/data/cascade/haar_face_0.xml")
+	benchmarkCascade(b, "cascade/haar_face_0.xml")
 }
 
 func BenchmarkSimdCascadeLbp(b *testing.B) {
 
-    benchmarkCascade(b, "/home/ec2-user/c_apps/Simd/data/cascade/lbp_face.xml")
+	benchmarkCascade(b, "cascade/lbp_face.xml")
 }
 
 /*
@@ -387,7 +388,7 @@ func BenchmarkOpenCVGraytoBGR(b *testing.B) {
 
 func benchmarkOpenCVCascade(b *testing.B, cascade string) {
 
-        mat := opencv.LoadImage("/home/ec2-user/work/src/github.com/lazywei/go-opencv/images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
+	mat := opencv.LoadImage("images/lena.jpg", opencv.CV_LOAD_IMAGE_COLOR)
 
 	detect := opencv.LoadHaarClassifierCascade(cascade)
 
@@ -398,7 +399,7 @@ func benchmarkOpenCVCascade(b *testing.B, cascade string) {
 
 func BenchmarkOpenCVCascadeHaar(b *testing.B) {
 
-    benchmarkOpenCVCascade(b, "/home/ec2-user/work/src/github.com/lazywei/go-opencv/samples/haarcascade_frontalface_alt.xml" )
+	benchmarkOpenCVCascade(b, "cascade/haarcascade_frontalface_alt.xml")
 }
 
 func benchmarkOpenCVSobel(b *testing.B, channels int) {

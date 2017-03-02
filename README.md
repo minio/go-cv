@@ -4,10 +4,10 @@ Golang wrapper for https://github.com/ermig1979/Simd
 
 ## Installation
 
-Install Simd
+Install Simd first follow the document [here](https://github.com/minio/Simd/blob/master/README.md)
 
 ```
-go get github.com/fwessels/go-cv
+go get -u github.com/minio/go-cv
 ```
 
 ## Examples
