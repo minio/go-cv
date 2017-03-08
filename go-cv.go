@@ -9,7 +9,6 @@ import "C"
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"image/draw"
 	_ "image/jpeg"
@@ -54,12 +53,5 @@ func DetectObjects(img *image.RGBA, detect unsafe.Pointer) string {
 }
 
 func DetectInitialize(cascade string) unsafe.Pointer {
-	var detect unsafe.Pointer
-	detect = C.SimdDetectInitialize(C.CString(cascade))
-
-	return detect
-}
-
-func main() {
-	fmt.Println(LoadDetect())
+	return C.SimdDetectInitialize(C.CString(cascade))
 }

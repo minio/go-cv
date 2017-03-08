@@ -12,8 +12,11 @@ import (
 // ingroup object_detection
 
 func DetectionLoadA(path string) unsafe.Pointer {
-
 	return C.SimdDetectionLoadA(C.CString(path))
+}
+
+func DetectionLoadABuf(buf []byte) unsafe.Pointer {
+	return C.SimdDetectionLoadABuf(unsafe.Pointer(&buf[0]), C.int(len(buf)))
 }
 
 func DetectionInfo(data unsafe.Pointer) (w, h, f int) {

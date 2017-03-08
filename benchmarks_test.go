@@ -3,7 +3,6 @@ package gocv
 import (
 	"io/ioutil"
 	"testing"
-	"unsafe"
 
 	"github.com/anthonynsimon/bild/blur"
 	"github.com/anthonynsimon/bild/noise"
@@ -164,53 +163,6 @@ func BenchmarkSimdGraytoBGR(b *testing.B) {
 	}
 }
 
-func setupDectection(path string) (unsafe.Pointer, unsafe.Pointer, int, int, int, int, View, View) {
-
-	throughColumn, int16 := 0, 0
-
-	src, _ := SimdSetup(GRAY8)
-
-	width, height := src.width, src.height
-
-	sum, sqsum, tilted := View{}, View{}, View{}
-	sum.Recreate(width+1, height+1, INT32)
-	sqsum.Recreate(width+1, height+1, INT32)
-	tilted.Recreate(width+1, height+1, INT32)
-
-	dat := DetectionLoadA(path)
-	if dat == nil {
-		panic("Cannot load cascade")
-	}
-
-	hid := DetectionInit(dat, sum, sqsum, tilted, throughColumn, int16)
-	if hid == nil {
-		panic("Cannot initialize haar cascade" /*"Cannot initialize LBP cascade"*/)
-	}
-
-	mask := View{}
-	mask.Recreate(width, height, GRAY8)
-	Fill(mask, 1)
-
-	w, h, _ := DetectionInfo(dat)
-
-	// if ((flags &SimdDetectionInfoFeatureMask) == SimdDetectionInfoFeatureLbp)
-	//     Simd::Integral(src, sum);
-	// if (flags&SimdDetectionInfoHasTilted)
-	//     Simd::Integral(src, sum, sqsum, tilted);
-	// else
-	Integral(src, sum, sqsum, tilted)
-
-	DetectionPrepare(hid)
-
-	dst1, dst2 := View{}, View{}
-	dst1.Recreate(width, height, GRAY8)
-	dst2.Recreate(width, height, GRAY8)
-
-	Fill(dst1, 0)
-
-	return dat, hid, width, height, w, h, mask, dst1
-}
-
 func benchmarkCascade(b *testing.B, cascade string) {
 	buf, err := ioutil.ReadFile("images/lena.jpg")
 	if err != nil {
@@ -233,17 +185,6 @@ func BenchmarkSimdCascadeHaar(b *testing.B) {
 
 func BenchmarkSimdCascadeLbp(b *testing.B) {
 	benchmarkCascade(b, "cascade/lbp_face.xml")
-}
-
-func benchmarkSimdSobel(b *testing.B, f Format) {
-	src, _ := SimdSetup(GRAY8)
-	dst := View{}
-	dst.Recreate(Resolution, Resolution, INT16)
-
-	for i := 0; i < b.N; i++ {
-		SobelDx(src, dst)
-		SobelDy(src, dst)
-	}
 }
 
 /////////////////////////////////////////////////////////////////////
