@@ -13,11 +13,14 @@ func main() {
 	if err != nil {
 		panic("error loading from file")
 	}
-	pmat := gocv.DecodeImageMemM(buf)
+	rgba, err := gocv.DecodeImageMem(buf)
+	if err != nil {
+		panic(err)
+	}
 
 	detect := gocv.DetectInitialize("./data/cascades/haar_face_0.xml")
 
-	json := gocv.DetectObjects(pmat, detect)
+	json := gocv.DetectObjects(rgba, detect)
 
 	fmt.Println(json)
 }
